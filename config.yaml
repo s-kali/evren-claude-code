@@ -1,0 +1,12 @@
+# EVREN'deki tüm modelleri tek kayıtla geçirir: glm-5.3, deepseek-v4-flash,
+# qwen3.8-flash-next, auto... Model adı Claude Code tarafında seçilir.
+model_list:
+  - model_name: "*"
+    litellm_params:
+      model: openai/*
+      api_base: https://evren-llmapi.ssyz.org.tr/v1
+      api_key: os.environ/EVREN_API_KEY
+
+# Claude Code'un gönderdiği Anthropic'e özgü parametreleri (thinking vb.) düşürür.
+litellm_settings:
+  drop_params: true
