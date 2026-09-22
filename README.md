@@ -43,42 +43,26 @@ claude
 
 ## Model eşlemesi
 
-`claude-settings.json` içinden değiştirilir; `config.yaml`'a dokunmanıza gerek
-yok, joker kayıt EVREN'deki tüm modelleri geçirir.
+Hangi modelin hangi rolde kullanılacağı `claude-settings.json` içinden
+değiştirilir. Modellerin kendisi `config.yaml`'da tanımlıdır.
 
 | Claude Code | EVREN | Ne için |
 |---|---|---|
-| varsayılan | `glm-5.3` | derin akıl yürütme, en yetenekli model |
-| Sonnet | `deepseek-v4-flash` | kod ve ajan görevleri, 1M bağlam |
-| Haiku | `qwen3.8-flash-next` | arka plan işleri, hızlı |
+| varsayılan / Sonnet | `deepseek-v4-flash` | kod ve ajan görevleri, 1M bağlam, hızlı |
+| Haiku | `qwen3.8-flash-next` | arka plan işleri |
+| Opus | `glm-5.3` | derin akıl yürütme — yavaş, bilerek seçin |
 
 Oturum içinde `/model` ile geçebilirsiniz.
 
-## Doğrulama
-
-Claude Code araç çağırmaya dayanır; modeller `tools` desteklemezse dosya
-okuma/düzenleme döngüsü çalışmaz. Bir kez test edin:
-
-```sh
-curl -s http://localhost:4000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"glm-5.3",
-       "messages":[{"role":"user","content":"Istanbul hava durumu?"}],
-       "tools":[{"type":"function","function":{"name":"get_weather",
-         "parameters":{"type":"object","properties":{"city":{"type":"string"}},
-         "required":["city"]}}}]}'
-```
-
-Yanıtta `tool_calls` varsa yolunda.
+> - `glm-5.3` filonun en yetenekli modeli ama kuyrukta uzun bekleyebiliyor
+> (ölçülen: tek istekte ~3 dakika). Claude Code tur başına birçok istek attığı
+> için varsayılan `deepseek-v4-flash`. Derin düşünme gerektiren tek bir soru
+> için `/model opus` ile geçin.
+>
+> - `/v1/models` yalnızca `config.yaml`'da tanımlı modelleri listeler. Başka bir
+>  EVREN modeli kullanmak için oraya aynı kalıpta bir kayıt ekleyin.
 
 ## Notlar
 
-- Proxy `127.0.0.1`'e bağlı, dışarıdan erişilemez; bu yüzden ayrı bir proxy
-  parolası yok. `ANTHROPIC_AUTH_TOKEN` yalnızca Claude Code boş bırakmadığı
-  için var, değeri önemsiz.
-- `.env` değişirse: `docker compose up -d --force-recreate`
-- Loglar: `docker compose logs -f litellm`
-- Joker kayıt sorun çıkarırsa `config.yaml`'da `model_name: "*"` yerine model
-  adını (`glm-5.3`) ve `model:` alanına `openai/glm-5.3` yazıp sabitleyin.
 - Çıkarım modelleri 2026-11-01'e kadar ücretsiz. Limitler günlük ~10M, dakikalık
   ~500K token; Claude Code büyük bağlam gönderdiği için kota hızlı dolabilir.
